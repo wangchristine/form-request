@@ -141,7 +141,7 @@ class Uppercase implements Rule
 
 add `resources/lang/en/validation.php`, and other country languages.
 
-# Error handler:
+# Error handler
 
 > app/Exceptions/Handler.php
 
