@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Foundation\Http;
+namespace CHHW\FormRequest;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Container\Container;
@@ -8,7 +8,6 @@ use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 use Illuminate\Validation\ValidationException;
 
@@ -22,13 +21,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
-
-    /**
-     * The redirector instance.
-     *
-     * @var \Illuminate\Routing\Redirector
-     */
-    protected $redirector;
 
     /**
      * The URI to redirect to if validation fails.
@@ -128,28 +120,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected function failedValidation(Validator $validator)
     {
         throw (new ValidationException($validator))
-            ->errorBag($this->errorBag)
-            ->redirectTo($this->getRedirectUrl());
-    }
-
-    /**
-     * Get the URL to redirect to on a validation error.
-     *
-     * @return string
-     */
-    protected function getRedirectUrl()
-    {
-        $url = $this->redirector->getUrlGenerator();
-
-        if ($this->redirect) {
-            return $url->to($this->redirect);
-        } elseif ($this->redirectRoute) {
-            return $url->route($this->redirectRoute);
-        } elseif ($this->redirectAction) {
-            return $url->action($this->redirectAction);
-        }
-
-        return $url->previous();
+            ->errorBag($this->errorBag);
     }
 
     /**
@@ -217,19 +188,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function setValidator(Validator $validator)
     {
         $this->validator = $validator;
-
-        return $this;
-    }
-
-    /**
-     * Set the Redirector instance.
-     *
-     * @param  \Illuminate\Routing\Redirector  $redirector
-     * @return $this
-     */
-    public function setRedirector(Redirector $redirector)
-    {
-        $this->redirector = $redirector;
 
         return $this;
     }

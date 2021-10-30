@@ -1,11 +1,14 @@
 <?php
 
-namespace Illuminate\Foundation\Providers;
+namespace CHHW\FormRequest;
 
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
+use CHHW\FormRequest\FormRequest;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Validation\ValidationException;
 
 class FormRequestServiceProvider extends ServiceProvider
 {
@@ -16,7 +19,7 @@ class FormRequestServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->registerRequestValidation();
     }
 
     /**
@@ -33,7 +36,31 @@ class FormRequestServiceProvider extends ServiceProvider
         $this->app->resolving(FormRequest::class, function ($request, $app) {
             $request = FormRequest::createFrom($app['request'], $request);
 
-            $request->setContainer($app)->setRedirector($app->make(Redirector::class));
+            $request->setContainer($app);
+        });
+    }
+
+    /**
+     * Register the "validate" macro on the request.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function registerRequestValidation()
+    {
+        Request::macro('validate', function (array $rules, ...$params) {
+            return validator()->validate($this->all(), $rules, ...$params);
+        });
+
+        Request::macro('validateWithBag', function (string $errorBag, array $rules, ...$params) {
+            try {
+                return $this->validate($rules, ...$params);
+            } catch (ValidationException $e) {
+                $e->errorBag = $errorBag;
+
+                throw $e;
+            }
         });
     }
 }
