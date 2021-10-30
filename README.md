@@ -135,7 +135,7 @@ class Uppercase implements Rule
 }
 ```
 
-# Customizing Localization Error Messages
+# Customize Localization Error Messages
 
 > just like laravel !
 
