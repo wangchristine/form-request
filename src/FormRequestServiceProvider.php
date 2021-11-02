@@ -4,14 +4,24 @@ namespace CHHW\FormRequest;
 
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Http\Request;
+use CHHW\FormRequest\Commands\RequestMakeCommand;
+use CHHW\FormRequest\Commands\RuleMakeCommand;
 use CHHW\FormRequest\FormRequest;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 
 class FormRequestServiceProvider extends ServiceProvider
 {
+    protected $commands = [
+        //
+    ];
+
+    protected $devCommands = [
+        'RequestMake' => 'command.request.make',
+        'RuleMake' => 'command.rule.make',
+    ];
+
     /**
      * Register the service provider.
      *
@@ -20,6 +30,10 @@ class FormRequestServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerRequestValidation();
+
+        $this->registerCommands(array_merge(
+            $this->commands, $this->devCommands
+        ));
     }
 
     /**
@@ -61,6 +75,45 @@ class FormRequestServiceProvider extends ServiceProvider
 
                 throw $e;
             }
+        });
+    }
+
+    /**
+     * Register the given commands.
+     *
+     * @param  array  $commands
+     * @return void
+     */
+    protected function registerCommands(array $commands)
+    {
+        foreach (array_keys($commands) as $command) {
+            $this->{"register{$command}Command"}();
+        }
+
+        $this->commands(array_values($commands));
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerRequestMakeCommand()
+    {
+        $this->app->singleton('command.request.make', function ($app) {
+            return new RequestMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerRuleMakeCommand()
+    {
+        $this->app->singleton('command.rule.make', function ($app) {
+            return new RuleMakeCommand($app['files']);
         });
     }
 }
