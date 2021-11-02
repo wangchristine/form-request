@@ -135,6 +135,12 @@ class Uppercase implements Rule
 }
 ```
 
+### Get Request and Rule file by command:
+```bash
+php artisan make:request CreatePost
+php artisan make:rule Uppercase
+```
+
 # Customize Localization Error Messages
 
 > just like laravel !
